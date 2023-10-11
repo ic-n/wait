@@ -1,5 +1,9 @@
 # Go Wait Library with Generics
 
+[![Build Status](https://github.com/ic-n/wait/workflows/continuous-integration/badge.svg)](https://github.com/ic-n/wait/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ic-n/wait)](https://goreportcard.com/report/github.com/ic-n/wait)
+[![Go Reference](https://pkg.go.dev/badge/github.com/ic-n/wait.svg)](https://pkg.go.dev/github.com/ic-n/wait)
+
 The **Go Wait** library is a Go package that provides a simple and efficient way to manage goroutines and gather their results using generics. It is designed as a wrapper for the standard `sync.WaitGroup` and allows you to work with goroutines that may return values or errors. This library simplifies error handling and provides a convenient interface for gathering results from concurrent tasks.
 
 ## Installation
