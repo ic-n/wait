@@ -11,7 +11,7 @@ The **Go Wait** library is a Go package that provides a simple and efficient way
 You can install the Go Wait library using the `go get` command:
 
 ```bash
-go get github.com/your/repository/wait
+go get github.com/ic-n/wait
 ```
 
 ## Getting Started
@@ -19,57 +19,7 @@ go get github.com/your/repository/wait
 To use the Go Wait library in your Go project, import it into your code:
 
 ```go
-import "github.com/your/repository/wait"
-```
-
-## Usage
-
-The Go Wait library provides a `Group[T]` data structure with the following methods:
-
-### `New[T any]() *Group[T]`
-
-Creates a new `Group` with a background context.
-
-```go
-group := wait.New[int]()
-```
-
-### `WithContext[T any](ctx context.Context) *Group[T]`
-
-Creates a new `Group` with a custom context. You can use this to control the lifecycle of the group.
-
-```go
-ctx := context.Background()
-group := wait.WithContext[int](ctx)
-```
-
-### `Go(fn func(ctx context.Context) (T, error))`
-
-Starts a new goroutine that executes the specified function. The function takes a context and returns a value of type `T` and an error.
-
-```go
-group.Go(func(ctx context.Context) (int, error) {
-    // Your concurrent task logic here
-    return 42, nil
-})
-```
-
-### `Gather(gatherer func(T)) error`
-
-Gathers results from the executed goroutines. The `gatherer` function is called for each result, and any errors are collected. This function blocks until all goroutines have completed.
-
-```go
-err := group.Gather(func(result int) {
-    // Process the result
-})
-```
-
-### `Wait() ([]T, error)`
-
-Gathers results from the executed goroutines and returns a slice of results and any errors encountered. This function also blocks until all goroutines have completed.
-
-```go
-results, err := group.Wait()
+import "github.com/ic-n/wait"
 ```
 
 ## Example
@@ -81,22 +31,54 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/ic-n/wait"
 )
 
+type Data struct {
+	Headers struct {
+		Host      string `json:"Host"`
+		UserAgent string `json:"User-Agent"`
+	} `json:"headers"`
+	Origin string `json:"origin"`
+	URL    string `json:"url"`
+}
+
 func main() {
-	group := wait.New[int]()
+	g := wait.New[Data]()
 
-	for i := 0; i < 5; i++ {
-		i := i
-		group.Go(func(ctx context.Context) (int, error) {
-			return i * 2, nil
-		})
-	}
+	g.Go(func(ctx context.Context) (Data, error) {
+		rsp, err := http.Get("https://httpbin.org/get")
+		if err != nil {
+			return Data{}, err
+		}
 
-	err := group.Gather(func(result int) {
+		var d Data
+		if err := json.NewDecoder(rsp.Body).Decode(&d); err != nil {
+			return Data{}, err
+		}
+
+		return d, nil
+	})
+
+	g.Go(func(ctx context.Context) (Data, error) {
+		rsp, err := http.Post("https://httpbin.org/post", "text/plain", http.NoBody)
+		if err != nil {
+			return Data{}, err
+		}
+
+		var d Data
+		if err := json.NewDecoder(rsp.Body).Decode(&d); err != nil {
+			return Data{}, err
+		}
+
+		return d, nil
+	})
+
+	err := g.Gather(func(result Data) {
 		fmt.Println("Result:", result)
 	})
 
