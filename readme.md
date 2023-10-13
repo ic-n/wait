@@ -1,6 +1,6 @@
 # Go Wait Library with Generics
 
-[![Build Status](https://github.com/ic-n/wait/workflows/continuous-integration/badge.svg)](https://github.com/ic-n/wait/actions)
+[![Build Status](https://github.com/ic-n/wait/workflows/Go/badge.svg)](https://github.com/ic-n/wait/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ic-n/wait)](https://goreportcard.com/report/github.com/ic-n/wait)
 [![Go Reference](https://pkg.go.dev/badge/github.com/ic-n/wait.svg)](https://pkg.go.dev/github.com/ic-n/wait)
 
